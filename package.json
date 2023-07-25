@@ -1,0 +1,15 @@
+{
+  "author": "",
+  "description": "",
+  "devDependencies": {
+    "elm-go": "^5.0.19"
+  },
+  "license": "ISC",
+  "main": "index.js",
+  "name": "spiritisland",
+  "scripts": {
+    "dev": "elm-go --host 0.0.0.0 --port 8001 src/Main.elm --dir=./www -- --output=www/elm.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.1.0"
+}
