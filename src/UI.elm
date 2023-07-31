@@ -1,6 +1,6 @@
 module UI exposing (..)
 
-import Element exposing (Element, behindContent, centerX, centerY, el, fill, height, mouseDown, mouseOver, none, padding, paddingEach, px, rgb, row, spacing, width)
+import Element exposing (Element, behindContent, centerX, centerY, el, fill, height, mouseDown, mouseOver, padding, paddingEach, px, row, spacing, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events exposing (onClick)

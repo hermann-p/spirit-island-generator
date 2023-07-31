@@ -205,7 +205,7 @@ playerView idx spirit =
 mainView : Model -> List (Element Msg)
 mainView model =
     [ selectPlayersView model
-    , UI.button { onPress = RollAllSpirits, label = el [ centerX ] (text "Geister neu würfeln"), disabled = False }
+    , UI.button { onPress = RollAllSpirits, label = el [ centerX ] (image [ height <| px 64 ] { src = "/misc/Dice.png", description = "Roll the dice" }), disabled = False }
     , List.take model.nPlayers model.players |> List.indexedMap playerView |> toGrid 2 identity
     ]
 
@@ -220,13 +220,21 @@ view model =
 
                 SettingsView ->
                     settingsView
+
+        toIconUrl v =
+            case v of
+                MainView ->
+                    "/misc/SILogo.png"
+
+                SettingsView ->
+                    "/misc/Spiritsicon.png"
     in
     { title = "Spirit Island game generator"
     , body =
         [ layout [ padding 16 ]
             (column [ width fill, spacing 32 ]
                 ([ UI.tabRibbon
-                    { toElement = \_ -> text "ELEMENT", onClick = \v -> SetView v, selected = model.currentView }
+                    { toElement = \v -> image [ height <| px 64 ] { src = toIconUrl v, description = "Navigation icon" }, onClick = \v -> SetView v, selected = model.currentView }
                     [ MainView, SettingsView ]
                  ]
                     ++ content model
