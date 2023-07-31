@@ -2,8 +2,9 @@ module Main exposing (..)
 
 import Browser
 import Dict exposing (update)
-import Element exposing (Element, centerX, column, el, fill, image, layout, padding, paddingXY, row, spacing, text, width)
-import Element.Input exposing (button, labelAbove)
+import Element exposing (Element, centerX, centerY, column, el, fill, height, image, layout, padding, paddingXY, px, row, spacing, text, width)
+import Element.Font as Font exposing (Font)
+import Element.Input exposing (button, labelAbove, labelLeft, labelRight)
 import Random exposing (generate)
 import Random.List exposing (choices, choose)
 import Spirits exposing (Spirit, spirits)
@@ -18,8 +19,8 @@ maxPlayers =
 
 
 type alias Model =
-    { availableSpirits : List Spirit
-    , chosenSpirits : List Spirit
+    { poolOfSpirits : List Spirit
+    , availableSpirits : List Spirit
     , nPlayers : Int
     , players : List Spirit
     , currentView : View
@@ -29,10 +30,10 @@ type alias Model =
 initial : Model
 initial =
     { nPlayers = 2
+    , poolOfSpirits = spirits
     , availableSpirits = spirits
     , players = []
     , currentView = MainView
-    , chosenSpirits = []
     }
 
 
@@ -51,12 +52,12 @@ init _ =
 
 
 type Msg
-    = NoOp
-    | SetPlayers Int
+    = SetPlayers Int
     | RollAllSpirits
     | SetAllSpirits ( List Spirit, List Spirit )
     | RollSpirit Int
     | SetSpirit Int ( Maybe Spirit, List Spirit )
+    | SetSpiritIsInPool Bool Spirit
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -96,12 +97,23 @@ update msg model =
                         model.players
 
                 availableSpirits =
-                    List.filter (\spirit -> not <| List.member spirit players) spirits
+                    List.filter (\spirit -> not <| List.member spirit players) model.poolOfSpirits
             in
             ( { model | players = players, availableSpirits = availableSpirits }, Cmd.none )
 
-        _ ->
+        SetSpirit _ _ ->
             ( model, Cmd.none )
+
+        SetSpiritIsInPool isInPool spirit ->
+            let
+                pool =
+                    if isInPool then
+                        model.poolOfSpirits ++ [ spirit ]
+
+                    else
+                        List.filter (\s -> s /= spirit) model.poolOfSpirits
+            in
+            update RollAllSpirits { model | poolOfSpirits = pool }
 
 
 settingsView : model -> List (Element Msg)
@@ -111,13 +123,17 @@ settingsView _ =
 
 toGrid : Int -> (a -> Element msg) -> List a -> Element msg
 toGrid cols toElement xs =
+    let
+        emptyCol =
+            column [ width fill ] [ text "" ]
+    in
     if List.length xs < 2 then
-        xs |> List.head |> Maybe.map toElement |> Maybe.withDefault (text "")
+        xs |> List.head |> Maybe.map toElement |> Maybe.withDefault emptyCol
 
     else
         xs
             |> List.map toElement
-            |> splitListFull cols (column [ width fill ] [ text "" ])
+            |> splitListFull cols emptyCol
             |> List.map (row [ width fill, spacing 16, paddingXY 0 8 ])
             |> column [ width fill ]
 
@@ -143,14 +159,16 @@ spiritToggle spirit =
 
 selectPlayersView : Model -> Element Msg
 selectPlayersView model =
-    UI.intSlider
-        { label = labelAbove [] <| el [ centerX ] (text <| "Spieler: " ++ fromInt model.nPlayers)
-        , min = 1
-        , max = maxPlayers
-        , onChange = SetPlayers
-        , step = 1
-        , value = model.nPlayers
-        }
+    row [ width fill, centerY ]
+        [ UI.intSlider
+            { label = labelLeft [] <| row [ centerY, spacing 16, Font.size 64 ] [ image [ height <| px 96 ] { src = "/misc/Spiritsicon.png", description = "Spirits" }, text <| fromInt model.nPlayers ]
+            , min = 1
+            , max = maxPlayers
+            , onChange = SetPlayers
+            , step = 1
+            , value = model.nPlayers
+            }
+        ]
 
 
 spiritToImageUrl : Spirit -> String
