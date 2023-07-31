@@ -43,7 +43,8 @@ type alias Flags =
 
 type View
     = MainView
-    | SettingsView
+    | SpiritSettingsView
+    | AdversariesSettingsView
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -218,7 +219,8 @@ view model =
                 MainView ->
                     mainView
 
-                SettingsView ->
+                _ ->
+                    -- SpiritSettingsView ->
                     settingsView
 
         toIconUrl v =
@@ -226,8 +228,11 @@ view model =
                 MainView ->
                     "/misc/SILogo.png"
 
-                SettingsView ->
+                SpiritSettingsView ->
                     "/misc/Spiritsicon.png"
+
+                AdversariesSettingsView ->
+                    "/misc/Fearicon.png"
     in
     { title = "Spirit Island game generator"
     , body =
@@ -235,7 +240,7 @@ view model =
             (column [ width fill, spacing 32 ]
                 ([ UI.tabRibbon
                     { toElement = \v -> image [ height <| px 64 ] { src = toIconUrl v, description = "Navigation icon" }, onClick = \v -> SetView v, selected = model.currentView }
-                    [ MainView, SettingsView ]
+                    [ MainView, SpiritSettingsView, AdversariesSettingsView ]
                  ]
                     ++ content model
                 )
