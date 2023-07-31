@@ -176,7 +176,7 @@ tabItem ({ toElement, isSelected } as cfg) item =
     el
         [ Border.widthEach borderWidths
         , Border.roundEach corners
-        , Border.color MC.blue300
+        , Border.color MC.green500
         , onClick <| cfg.onClick item
         ]
     <|
