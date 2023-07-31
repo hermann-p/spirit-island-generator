@@ -3,8 +3,8 @@ module Main exposing (..)
 import Browser
 import Dict exposing (update)
 import Element exposing (Element, centerX, centerY, column, el, fill, height, image, layout, padding, paddingXY, px, row, spacing, text, width)
-import Element.Font as Font exposing (Font)
-import Element.Input exposing (button, labelAbove, labelLeft, labelRight)
+import Element.Font as Font
+import Element.Input exposing (button, labelLeft)
 import Random exposing (generate)
 import Random.List exposing (choices, choose)
 import Spirits exposing (Spirit, spirits)
@@ -58,6 +58,7 @@ type Msg
     | RollSpirit Int
     | SetSpirit Int ( Maybe Spirit, List Spirit )
     | SetSpiritIsInPool Bool Spirit
+    | SetView View
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -69,7 +70,7 @@ update msg model =
         RollAllSpirits ->
             let
                 spiritGenerator =
-                    choices maxPlayers model.availableSpirits
+                    choices maxPlayers model.poolOfSpirits
             in
             ( model, generate SetAllSpirits spiritGenerator )
 
@@ -115,10 +116,13 @@ update msg model =
             in
             update RollAllSpirits { model | poolOfSpirits = pool }
 
+        SetView v ->
+            ( { model | currentView = v }, Cmd.none )
 
-settingsView : model -> List (Element Msg)
-settingsView _ =
-    List.map spiritToggle spirits
+
+settingsView : Model -> List (Element Msg)
+settingsView model =
+    [ row [ width fill ] [ toGrid 3 (spiritToggle model) spirits ] ]
 
 
 toGrid : Int -> (a -> Element msg) -> List a -> Element msg
@@ -152,9 +156,23 @@ selectList cfg =
     toGrid 2 selectElement cfg.options
 
 
-spiritToggle : Spirit -> Element Msg
-spiritToggle spirit =
-    image [] { description = spirit.name, src = spiritToImageUrl spirit }
+spiritToggle : Model -> Spirit -> Element Msg
+spiritToggle model spirit =
+    let
+        isActive =
+            List.member spirit model.poolOfSpirits
+
+        spiritImage =
+            image [ width fill ] { description = spirit.name, src = spiritToImageUrl spirit }
+    in
+    column [ width fill ]
+        [ UI.imageToggle
+            { disabled = False
+            , active = isActive
+            , label = spiritImage
+            , onPress = SetSpiritIsInPool (not isActive) spirit
+            }
+        ]
 
 
 selectPlayersView : Model -> Element Msg
@@ -207,7 +225,12 @@ view model =
     , body =
         [ layout [ padding 16 ]
             (column [ width fill, spacing 32 ]
-                (content model)
+                ([ UI.tabRibbon
+                    { toElement = \_ -> text "ELEMENT", onClick = \v -> SetView v, selected = model.currentView }
+                    [ MainView, SettingsView ]
+                 ]
+                    ++ content model
+                )
             )
         ]
     }
