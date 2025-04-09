@@ -1,0 +1,7 @@
+{
+  "name": "Spirit Island",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

@@ -2,6 +2,8 @@
   "author": "",
   "description": "",
   "devDependencies": {
+    "@capacitor/cli": "^7.2.0",
+    "@capacitor/core": "^7.2.0",
     "elm-go": "^5.0.19"
   },
   "license": "ISC",
@@ -11,5 +13,12 @@
     "dev": "elm-go --host 0.0.0.0 --port 8001 src/Main.elm --dir=./www -- --output=www/elm.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "dependencies": {
+    "@capacitor/android": "7.2.0",
+    "@capacitor/app": "7.0.1",
+    "@capacitor/haptics": "7.0.1",
+    "@capacitor/keyboard": "7.0.1",
+    "@capacitor/status-bar": "7.0.1"
+  }
 }
